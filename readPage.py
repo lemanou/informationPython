@@ -23,7 +23,6 @@ def parseNormal(myLink, postID):
 	for title in tree.findAll("h1", class_="node-title"):
 		# print title
 		article["title"] = title.contents[0]
-	# print type(title.contents[0])
 	neededClass = "field field-name-field-underrubrik"
 	for abstract in tree.findAll("div", class_=neededClass):
 		# print abstract
@@ -46,7 +45,6 @@ def parseTelegram(myLink, postID):
 	for title in tree.findAll("h1", class_="node-title"):
 		# print title
 		article["title"] = title.contents[0]
-	# print type(title.contents[0])
 	neededClass = "field field-name-field-ritzau-subheader"
 	for abstract in tree.findAll("div", class_=neededClass):
 		# print abstract
@@ -68,11 +66,56 @@ def parseNyheder(myLink, postID):
 	for title in tree.findAll("div", class_="field field-name-title"):
 		#print title.contents[0].contents[0]
 		article["title"] = title.contents[0].contents[0]
-	# print type(title.contents[0])
 	neededClass = "field field-name-field-underrubrik"
 	for abstract in tree.findAll("div", class_=neededClass):
 		# print abstract
 		article["abstract"] = abstract.contents[0]
+	for numCom in tree.findAll("li", class_="comment last"):
+		#print numCom.contents[0].contents[0]
+		article["comments"] = numCom.contents[0].contents[0]
+	return article
+	
+def parseBlog(myLink, postID):
+	article = {}
+	# Open the site
+	url = myLink + postID
+	# print "Opening: " + url
+	htmlfile = urllib.urlopen(url)
+	htmltext = htmlfile.read()
+	tree = BeautifulSoup(htmltext)
+	# Get the relevant parts from the page
+	for title in tree.findAll("h1", class_="node-title"):
+		#print title.contents[0]
+		article["title"] = title.contents[0]
+	neededClass = "field field-name-body"
+	for div in tree.find_all(class_=neededClass):
+		# Get the first child (<p>) in the div
+		for childdiv in div.find_all('p'):
+			article["abstract"] = childdiv.string
+			break
+	for numCom in tree.findAll("li", class_="comment last"):
+		#print numCom.contents[0].contents[0]
+		article["comments"] = numCom.contents[0].contents[0]
+	return article
+	
+def parseFilme(myLink, postID):
+	article = {}
+	# Open the site
+	url = myLink + postID
+	# print "Opening: " + url
+	htmlfile = urllib.urlopen(url)
+	htmltext = htmlfile.read()
+	tree = BeautifulSoup(htmltext)
+	# Get the relevant parts from the page
+	for title in tree.findAll("div", class_="field field-name-title"):
+		#print title.contents[0].contents[0]
+		article["title"] = title.contents[0].contents[0]
+	neededClass = "field field-name-body"
+	for div in tree.find_all(class_=neededClass):
+		# Get the first child (<p>) in the div
+		for childdiv in div.find_all('p'):
+			article["abstract"] = childdiv.string
+			break
 	for numCom in tree.findAll("li", class_="comment last"):
 		#print numCom.contents[0].contents[0]
 		article["comments"] = numCom.contents[0].contents[0]
@@ -107,44 +150,55 @@ def parseHTML():
 			myList.insert(len(myList), myId)
 	print "OUTPUT - Number of articles: " + str(count) + "\n"
 	# print type(myList)
-	myDict = {}
 
 	for i, postID in enumerate(myList):
 
 		# Open the article's site
 		myLink = myLink[0:25]
 		url = myLink + postID
-		print url
+		print postID
 		urlLength = len(url)
+		myDict = {}
+		check = False
 		
 		if (urlLength == 32):
 			# print "Normal/Random: " + str(urlLength)
 			myArticle = parseNormal(myLink, postID)
 			myDict[postID] = myArticle
+			check = True
 		elif (urlLength == 41):
 			# print "Telegram OR Protocol: " + str(urlLength)
 			myArticle = parseTelegram(myLink, postID)
 			myDict[postID] = myArticle
+			check = True
 		elif (urlLength == 43):
 			# print "Nyhedsblog: " + str(urlLength)
 			myArticle = parseNyheder(myLink, postID)
 			myDict[postID] = myArticle
-			break
-		elif (urlLength == 55):
-			print "Comment from random article: " + str(urlLength)
+			check = True
 		elif (urlLength == 44):
-			print "Blogs: " + str(urlLength)
+			# print "Blogs: " + str(urlLength)
+			myArticle = parseBlog(myLink, postID)
+			myDict[postID] = myArticle
+			check = True
 		elif (urlLength == 49):
-			print "Kortfilmsbloggen: " + str(urlLength)
+			# print "Kortfilmsbloggen: " + str(urlLength)
+			myArticle = parseFilme(myLink, postID)
+			myDict[postID] = myArticle
+			check = True
+		elif (urlLength == 55):
+			print "\t NOT PROCESSED - Comment from random article."
 		else:
-			print "Not processed / Unknown size: " + str(urlLength)	
-	
+			print "\t NOT PROCESSED -  Unknown length: " + str(urlLength)	
+		
+		if (check):
+			with open("dailyPosts" + postID + ".txt","w+")	as myfile:
+				json.dump(myDict, myfile, indent=4)
 	# for x in myDict:
 	# 	print (x)
 	#	for y in myDict[x]:
 	#		print (y,':',myDict[x][y])
 	
-	with open("dailyPosts/" + "myDictionary" + ".txt","w+")	as myfile:
-		json.dump(myDict, myfile, indent=4)
+
 	
 parseHTML()
