@@ -1,4 +1,0 @@
-informationPython
-=================
-
-readPage.py
