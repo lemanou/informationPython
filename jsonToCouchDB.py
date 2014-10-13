@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 from couchdb import Server, Database
-from couchdb.mapping import Document, TextField, IntegerField, DateTimeField
+from couchdb.mapping import Document, TextField, IntegerField, DateTimeField, ViewField
 
 
 class myArticles(Document):
@@ -34,7 +34,23 @@ def loadFromDB():
     # server = Server()
     db = Database('my_articles')
     for row in db.view('_all_docs'):
-        print(row.id)
+        # print(row.id)
+        article = myArticles.load(db, row.id)
+        # print article.rev
+        # print article.id
+        # print dir(article)
+        # print article.__getitem__
+        myDict = article.__dict__
+        # print type(myDict['_data'])
+        print "-------" + row.id + "---------"
+        # print article
+        for x in myDict:
+            # print (x)
+            for y in myDict[x]:
+                if (y == 'article'):
+                    print (y,':',myDict[x][y]) #['abstract']
+        print "--------------------------------"
+        
 
 
 def main():
