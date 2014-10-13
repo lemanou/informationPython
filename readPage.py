@@ -9,6 +9,7 @@ Information.dk mining
 import urllib
 import json
 from bs4 import BeautifulSoup
+import jsonToCouchDB
 
 
 def parseNormal(myLink, postID):
@@ -31,6 +32,7 @@ def parseNormal(myLink, postID):
     for numCom in tree.findAll("div", class_=neededClass):
         # print str(numCom)[104:107]
         article["comments"] = numCom.contents[0].contents[0]
+    article["id"] = postID
     return article
 
 
@@ -53,6 +55,7 @@ def parseTelegram(myLink, postID):
     for numCom in tree.findAll("a", class_="active"):
         # print str(numCom)[104:107]
         article["comments"] = numCom.contents[0]
+    article["id"] = postID
     return article
 
 
@@ -75,6 +78,7 @@ def parseNyheder(myLink, postID):
     for numCom in tree.findAll("li", class_="comment last"):
         # print numCom.contents[0].contents[0]
         article["comments"] = numCom.contents[0].contents[0]
+    article["id"] = postID
     return article
 
 
@@ -99,6 +103,7 @@ def parseBlog(myLink, postID):
     for numCom in tree.findAll("li", class_="comment last"):
         # print numCom.contents[0].contents[0]
         article["comments"] = numCom.contents[0].contents[0]
+    article["id"] = postID
     return article
 
 
@@ -123,6 +128,7 @@ def parseFilme(myLink, postID):
     for numCom in tree.findAll("li", class_="comment last"):
         # print numCom.contents[0].contents[0]
         article["comments"] = numCom.contents[0].contents[0]
+    article["id"] = postID
     return article
 
 
@@ -169,27 +175,27 @@ def parseHTML():
         if (urlLength == 32):
             # print "Normal/Random: " + str(urlLength)
             myArticle = parseNormal(myLink, postID)
-            myDict[postID] = myArticle
+            myDict["article"] = myArticle
             check = True
         elif (urlLength == 41):
             # print "Telegram OR Protocol: " + str(urlLength)
             myArticle = parseTelegram(myLink, postID)
-            myDict[postID] = myArticle
+            myDict["article"] = myArticle
             check = True
         elif (urlLength == 43):
             # print "Nyhedsblog: " + str(urlLength)
             myArticle = parseNyheder(myLink, postID)
-            myDict[postID] = myArticle
+            myDict["article"] = myArticle
             check = True
         elif (urlLength == 44):
             # print "Blogs: " + str(urlLength)
             myArticle = parseBlog(myLink, postID)
-            myDict[postID] = myArticle
+            myDict["article"] = myArticle
             check = True
         elif (urlLength == 49):
             # print "Kortfilmsbloggen: " + str(urlLength)
             myArticle = parseFilme(myLink, postID)
-            myDict[postID] = myArticle
+            myDict["article"] = myArticle
             check = True
         elif (urlLength == 55):
             print "\t NOT PROCESSED - Comment from random article."
@@ -198,10 +204,18 @@ def parseHTML():
 
         if (check):
             with open("dailyPosts" + postID + ".txt", "w+") as myfile:
-                json.dump(myDict, myfile, indent=4)
+                myResult = json.dump(myDict, myfile, indent=4)
+            jsonToCouchDB.storeInDB("dailyPosts/" + postID + ".txt")
     # for x in myDict:
     #   print (x)
     #   for y in myDict[x]:
     #       print (y,':',myDict[x][y])
 
-parseHTML()
+
+def main():
+    parseHTML()
+    jsonToCouchDB.loadFromDB()
+
+
+if __name__ == "__main__":
+    main()
