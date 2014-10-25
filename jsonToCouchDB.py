@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Sep 27 09:39:42 2014
+
+Information.dk mining
+---------------------------------------------------------
+"""
 from datetime import datetime
 import json
 from couchdb import Server, Database
-from couchdb.mapping import Document, TextField, IntegerField, DateTimeField, ViewField
+from couchdb.mapping import Document, TextField, DateTimeField
 
 
 class myArticles(Document):
@@ -9,14 +16,13 @@ class myArticles(Document):
     added = DateTimeField(default=datetime.now)
 
 
-def createDB():
+def createDB(name):
     server = Server()
-    db = server.create('my_articles')
+    db = server.create(name)
 
 
-def storeInDB(myPath):
-    # server = Server()
-    db = Database('my_articles')
+def storeFileInDB(myPath):
+    db = Database('informationDKarticles')
     with open(myPath, "r") as myfile:
         a = json.load(myfile)
     # Create dictionary from the JSON
@@ -30,8 +36,19 @@ def storeInDB(myPath):
         print "Article already exists. " + myID
 
 
+def storeDicInDB(locDB, myDic, postID):
+    db = Database(locDB)
+    # Select the parent from the dictionary
+    parent = myDic["article"]
+    myID = postID
+    if not(myID in db):
+        db[myID] = (myDic)
+        print "DB updated. " + myID
+    else:
+        print "Article already exists. " + myID
+
+
 def loadFromDB():
-    # server = Server()
     db = Database('my_articles')
     for row in db.view('_all_docs'):
         # print(row.id)
@@ -42,15 +59,13 @@ def loadFromDB():
         # print article.__getitem__
         myDict = article.__dict__
         # print type(myDict['_data'])
-        print "-------" + row.id + "---------"
-        # print article
+        print "------- " + row.id + " ---------"
         for x in myDict:
-            # print (x)
             for y in myDict[x]:
                 if (y == 'article'):
-                    print (y,':',myDict[x][y]) #['abstract']
+                    print myDict[x][y]['abstract'].encode('ascii', 'replace')  # .encode('utf-8')
+        break
         print "--------------------------------"
-        
 
 
 def main():
