@@ -31,10 +31,11 @@ def getBody(tree, postID):
         neededClass = "field field-name-body"
 
     for text in tree.findAll("div", class_=neededClass):
-        for childdiv in text.find_all('p'):
-            if not (childdiv.string is None):
-                body += childdiv.string
-
+        if not (childdiv.string is None):
+                body += childdiv.string            
+            if '<strong>' or '</strong>' in childdiv:
+                body += " "
+                
     return body
 
 
