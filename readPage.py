@@ -7,7 +7,7 @@ Information.dk mining
 """
 
 import urllib
-# import json
+import json
 from bs4 import BeautifulSoup
 import jsonToCouchDB
 
@@ -31,11 +31,12 @@ def getBody(tree, postID):
         neededClass = "field field-name-body"
 
     for text in tree.findAll("div", class_=neededClass):
-        if not (childdiv.string is None):
-                body += childdiv.string            
+        for childdiv in text.find_all('p'):
+            if not (childdiv.string is None):
+                body += childdiv.string
             if '<strong>' or '</strong>' in childdiv:
                 body += " "
-                
+
     return body
 
 
@@ -88,7 +89,6 @@ def parseNormal(myLink, postID):
 
     neededClass = "field-name-comment-count-link-top"
     for numCom in tree.findAll("div", class_=neededClass):
-        tmp = ""
         tmp = numCom.contents[0].contents[0][13:15]
         article["numberOfComments"] = removeParenthesis(tmp)
 
@@ -196,7 +196,6 @@ def parseFilme(myLink, postID):
 
     # Get the relevant parts from the page
     for title in tree.findAll("div", class_="field field-name-title"):
-        # print title.contents[0].contents[0]
         article["title"] = title.contents[0].contents[0]
 
     neededClass = "field field-name-body"
@@ -289,16 +288,13 @@ def parseHTML(myDB):
             print "\t NOT PROCESSED -  Unknown length: " + str(urlLength)
 
         if (check):
-            # with open("dailyPosts" + postID + ".txt", "w+") as myfile:
-            #     json.dump(myDict, myfile, indent=4)
-            # jsonToCouchDB.storeFileInDB("dailyPosts/" + postID + ".txt")
+            with open("dailyPosts" + postID + ".txt", "w+") as myfile:
+                json.dump(myDict, myfile, indent=4)
             jsonToCouchDB.storeDicInDB(myDB, myDict, postID)
 
 
 def main():
-    jsonToCouchDB.createDB('information_dk_articles')
     parseHTML('information_dk_articles')
-    # jsonToCouchDB.loadFromDB()
 
 
 if __name__ == "__main__":
