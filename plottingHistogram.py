@@ -20,16 +20,16 @@ with open( "ResultSentiment.txt", "r") as FileToRead:
         D[Average] = val3.strip(': ,')
         D[Sentiment] = val4.strip(': ,}')
         # CHANGE HERE
-        DintAverage = float(D[Average])
-        if(DintAverage < -2):
+        DfloatAverage = float(D[Average])
+        if(DfloatAverage < -2):
             SentimentScores[0] += 1
-        elif(DintAverage < -1):
+        elif(DfloatAverage < -1):
             SentimentScores[1] += 1
-        elif(DintAverage < 0):
+        elif(DfloatAverage < 0):
             SentimentScores[2] += 1
-        elif(DintAverage < 1):
+        elif(DfloatAverage < 1):
             SentimentScores[3] += 1
-        elif(DintAverage < 2):
+        elif(DfloatAverage < 2):
             SentimentScores[4] += 1
         else:
             SentimentScores[5] += 1
