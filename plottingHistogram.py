@@ -7,7 +7,9 @@ Created on Sun Sep 21 15:00:00 2014
 """
 
 with open( "ResultSentiment.txt", "r") as FileToRead:
-    FileToWrite = open('DataToPlot.txt', 'w')
+    # we read our article sentiment data and
+    # sort the articles in sentiment bins
+    # we plot the graph
     D = {}
     SentimentScores = [0,0,0,0,0,0]
     
@@ -31,6 +33,8 @@ with open( "ResultSentiment.txt", "r") as FileToRead:
             SentimentScores[4] += 1
         else:
             SentimentScores[5] += 1
+
+FileToRead.close()
 
 import matplotlib.pyplot as plt
 

@@ -5,9 +5,11 @@ Created on Sun Sep 21 10:31:23 2014
 @author: Sigurd
 
 """
-import collections
 
 with open( "ResultSentiment.txt", "r") as FileToRead:
+    # we read our article sentiment data and
+    # sort the average sentiments from low to high
+    # we save it to a file and plot the graph
     FileToWrite = open('DataToPlot.txt', 'w')
     D = {}
     Data = []
@@ -21,8 +23,9 @@ with open( "ResultSentiment.txt", "r") as FileToRead:
         DintAverage = float(D[Average])
         Data.append(DintAverage)
 
+FileToRead.close()
+
 sortedList = sorted(Data)
-print sortedList
 
 FileToWrite.write("%s\n" % sortedList)
 FileToWrite.close()
