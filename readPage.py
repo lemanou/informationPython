@@ -7,7 +7,6 @@ Information.dk mining
 """
 
 import urllib
-import json
 from bs4 import BeautifulSoup
 import jsonToCouchDB
 
@@ -54,7 +53,7 @@ def getComments(tree):
                     if not (childdiv.string is None):
                         count += 1
                         myArray.append(childdiv.string)
-            count = 0
+            count = 0  # !!!
             neededClass = "field-item even"
             for commentBody in comments.findAll("div", class_=neededClass):
                 count += 1
@@ -225,26 +224,21 @@ def parseHTML(myDB):
 
     title = newsList[0]
     myLink = title[0:26]
-    # print "\nConnecting to: " + myLink + "\n"
 
     # Open the link
     htmlobj = urllib.urlopen(myLink)
     htmltext = htmlobj.read()
     tree = BeautifulSoup(htmltext)
-    count = 0
+
     myList = []
     # Get the apostIDailable article posts of the page
     for node in tree.findAll("h3", class_="node-title"):
-        # print node
         soup = BeautifulSoup(str(node))
         for link in soup.findAll('a'):
-            # print link.get('href')
-            count += 1
             myId = link.get('href')
             # Inserting the new post to the end of the list
             myList.insert(len(myList), myId)
-    print "OUTPUT - Number of articles: " + str(count) + "\n"
-    # print type(myList)
+    print "OUTPUT - Number of possible articles: " + str(len(myList)) + "\n"
 
     for i, postID in enumerate(myList):
 
@@ -256,45 +250,50 @@ def parseHTML(myDB):
         myDict = {}
         check = False
 
-        if (urlLength == 32):
-            # print "Normal/Random: " + str(urlLength)
-            myArticle = parseNormal(myLink, postID)
-            myDict["article"] = myArticle
-            check = True
-        elif (urlLength == 41):
-            # print "Telegram OR Protocol: " + str(urlLength)
-            # Protocols have no abstract or numCom
-            myArticle = parseTelegram(myLink, postID)
-            myDict["article"] = myArticle
-            check = True
-        elif (urlLength == 43):
-            # print "Nyhedsblog: " + str(urlLength)
-            myArticle = parseNyheder(myLink, postID)
-            myDict["article"] = myArticle
-            check = True
-        elif (urlLength == 44):
-            # print "Blogs: " + str(urlLength)
-            myArticle = parseBlog(myLink, postID)
-            myDict["article"] = myArticle
-            check = True
-        elif (urlLength == 49):
-            # print "Kortfilmsbloggen: " + str(urlLength)
-            myArticle = parseFilme(myLink, postID)
-            myDict["article"] = myArticle
-            check = True
-        elif (urlLength == 55):
-            print "\t NOT PROCESSED - Comment from random article."
+        # First check if article is already in local DB
+        if (jsonToCouchDB.checkIfArticleInDB(myDB, postID) == 1):
+            print "Article already in DB - SKIPPING"
+        # If not, parse the article'spage
         else:
-            print "\t NOT PROCESSED -  Unknown length: " + str(urlLength)
+            if (urlLength == 32):
+                # print "Normal/Random: " + str(urlLength)
+                myArticle = parseNormal(myLink, postID)
+                myDict["article"] = myArticle
+                check = True
+            elif (urlLength == 41):
+                # print "Telegram OR Protocol: " + str(urlLength)
+                # Protocols have no abstract or numCom
+                myArticle = parseTelegram(myLink, postID)
+                myDict["article"] = myArticle
+                check = True
+            elif (urlLength == 43):
+                # print "Nyhedsblog: " + str(urlLength)
+                myArticle = parseNyheder(myLink, postID)
+                myDict["article"] = myArticle
+                check = True
+            elif (urlLength == 44):
+                # print "Blogs: " + str(urlLength)
+                myArticle = parseBlog(myLink, postID)
+                myDict["article"] = myArticle
+                check = True
+            elif (urlLength == 49):
+                # print "Kortfilmsbloggen: " + str(urlLength)
+                myArticle = parseFilme(myLink, postID)
+                myDict["article"] = myArticle
+                check = True
+            elif (urlLength == 55):
+                print "\t NOT PROCESSED - Comment from random article."
+            else:
+                print "\t NOT PROCESSED -  Unknown length: " + str(urlLength)
 
-        if (check):
-            with open("dailyPosts" + postID + ".txt", "w+") as myfile:
-                json.dump(myDict, myfile, indent=4)
-            jsonToCouchDB.storeDicInDB(myDB, myDict, postID)
+            if (check):
+                jsonToCouchDB.storeDicInDB(myDB, myDict, postID)
 
 
 def main():
-    parseHTML('information_dk_articles')
+    myDBname = 'information_dk_articles'
+    dbConnection = jsonToCouchDB.getConnectionDB(myDBname)
+    parseHTML(dbConnection)
 
 
 if __name__ == "__main__":
