@@ -8,7 +8,9 @@ Information.dk mining
 
 import urllib
 from bs4 import BeautifulSoup
-import jsonToCouchDB
+
+import dataToCouchDB
+import basicSentimentAnalysis
 
 
 def removeParenthesis(tmp):
@@ -21,6 +23,9 @@ def removeParenthesis(tmp):
 
 # Parsing the articles based on categories and tags
 def getBody(tree, postID):
+    '''
+    Function used to fetch all the body / <p> tags from an article
+    '''
     body = ""
     neededClass = ""
 
@@ -40,6 +45,9 @@ def getBody(tree, postID):
 
 
 def getComments(tree):
+    '''
+    Function used to fetch all the comments from an article
+    '''
     article = {}
     dAuthor = {}
     dDomment = {}
@@ -71,6 +79,9 @@ def getComments(tree):
 
 
 def parseNormal(myLink, postID):
+    '''
+    Function used to parse the normal articles
+    '''
     article = {}
     # Open the site
     url = myLink + postID
@@ -98,6 +109,9 @@ def parseNormal(myLink, postID):
 
 
 def parseTelegram(myLink, postID):
+    '''
+    Function used to parse the telegram articles
+    '''
     article = {}
     # Open the site
     url = myLink + postID
@@ -128,6 +142,9 @@ def parseTelegram(myLink, postID):
 
 
 def parseNyheder(myLink, postID):
+    '''
+    Function used to parse the news articles
+    '''
     article = {}
     # Open the site
     url = myLink + postID
@@ -155,6 +172,9 @@ def parseNyheder(myLink, postID):
 
 
 def parseBlog(myLink, postID):
+    '''
+    Function used to parse the blog articles
+    '''
     article = {}
     # Open the site
     url = myLink + postID
@@ -186,6 +206,9 @@ def parseBlog(myLink, postID):
 
 
 def parseFilme(myLink, postID):
+    '''
+    Function used to parse the film articles
+    '''
     article = {}
     # Open the site
     url = myLink + postID
@@ -216,12 +239,17 @@ def parseFilme(myLink, postID):
 
 
 def parseHTML(myDB):
+    '''
+    Function used to parse the information.dk main page
+    Find the relevant articles
+    Call the different "parser" for each article type
+    '''
 
     # Read and split the links from a file
     newsFile = open("myNewsSites.txt")
     newsList = newsFile.read()
     newsList = newsList.split("\n")
-
+    newArticleCount = 0
     title = newsList[0]
     myLink = title[0:26]
 
@@ -231,30 +259,30 @@ def parseHTML(myDB):
     tree = BeautifulSoup(htmltext)
 
     myList = []
-    # Get the apostIDailable article posts of the page
+    # Get all the available article posts (postID) from the page
     for node in tree.findAll("h3", class_="node-title"):
         soup = BeautifulSoup(str(node))
         for link in soup.findAll('a'):
             myId = link.get('href')
             # Inserting the new post to the end of the list
             myList.insert(len(myList), myId)
-    print "OUTPUT - Number of possible articles: " + str(len(myList)) + "\n"
+    # print "OUTPUT - Number of possible articles: " + str(len(myList)) + "\n"
 
     for i, postID in enumerate(myList):
-
-        # Open the article's site
-        myLink = myLink[0:25]
-        url = myLink + postID
         print postID
-        urlLength = len(url)
-        myDict = {}
-        check = False
-
         # First check if article is already in local DB
-        if (jsonToCouchDB.checkIfArticleInDB(myDB, postID) == 1):
+        if (dataToCouchDB.checkIfArticleInDB(myDB, postID) == 1):
             print "Article already in DB - SKIPPING"
-        # If not, parse the article'spage
+        # If not, parse the article's page
         else:
+            # Open the article's site
+            myLink = myLink[0:25]
+            url = myLink + postID
+            urlLength = len(url)
+            myDict = {}
+            check = False
+
+            # Different parsing based on article type / URL length
             if (urlLength == 32):
                 # print "Normal/Random: " + str(urlLength)
                 myArticle = parseNormal(myLink, postID)
@@ -284,17 +312,30 @@ def parseHTML(myDB):
             elif (urlLength == 55):
                 print "\t NOT PROCESSED - Comment from random article."
             else:
-                print "\t NOT PROCESSED -  Unknown length: " + str(urlLength)
+                print "\t NOT PROCESSED - Unknown type: " + str(urlLength)
 
+            # Check for "known" / parsed article.
             if (check):
-                jsonToCouchDB.storeDicInDB(myDB, myDict, postID)
+                dataToCouchDB.storeDicInDB(myDB, myDict, postID)
+                newArticleCount += 1
+
+    return newArticleCount, myList
 
 
 def main():
     myDBname = 'information_dk_articles'
-    dbConnection = jsonToCouchDB.getConnectionDB(myDBname)
-    parseHTML(dbConnection)
-
+    try:
+        dbConnection = dataToCouchDB.getConnectionDB(myDBname)
+    except Exception:
+        print "DB connection error. " + Exception
+    print "===Starting parsing==="
+    newArticleCount, myList = parseHTML(dbConnection)
+    print "===Starting sentiment calculation==="
+    calculated = basicSentimentAnalysis.startAnalysis(dbConnection)
+    print "============Results============"
+    print "Number of new articles: " + str(newArticleCount)
+    print "Out of: " + str(len(myList)) + " possible"
+    print "Number of calculated articles: " + str(calculated)
 
 if __name__ == "__main__":
     main()
