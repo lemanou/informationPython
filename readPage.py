@@ -10,6 +10,7 @@ import urllib
 from bs4 import BeautifulSoup
 
 import dataToCouchDB
+import fetchTags
 import basicSentimentAnalysis
 
 
@@ -50,7 +51,7 @@ def getComments(tree):
     '''
     article = {}
     dAuthor = {}
-    dDomment = {}
+    dComment = {}
     for comments in tree.findAll(class_="comment-wrapper"):
         myArray = []
         myArray2 = []
@@ -72,9 +73,9 @@ def getComments(tree):
                 myArray2.append(cmnt)
         for id in range(len(myArray)):
             dAuthor[id] = myArray[id]
-            dDomment[id] = myArray2[id]
+            dComment[id] = myArray2[id]
         article["commentsAuthor"] = dAuthor
-        article["commentsBody"] = dDomment
+        article["commentsBody"] = dComment
     return article
 
 
@@ -178,7 +179,6 @@ def parseBlog(myLink, postID):
     article = {}
     # Open the site
     url = myLink + postID
-    # print "Opening: " + url
     htmlfile = urllib.urlopen(url)
     htmltext = htmlfile.read()
     tree = BeautifulSoup(htmltext)
@@ -266,13 +266,12 @@ def parseHTML(myDB):
             myId = link.get('href')
             # Inserting the new post to the end of the list
             myList.insert(len(myList), myId)
-    # print "OUTPUT - Number of possible articles: " + str(len(myList)) + "\n"
 
     for i, postID in enumerate(myList):
-        print postID
+        print "+readPage: " + str(postID)
         # First check if article is already in local DB
         if (dataToCouchDB.checkIfArticleInDB(myDB, postID) == 1):
-            print "Article already in DB - SKIPPING"
+            print "-readPage: Article already in DB - SKIPPING"
         # If not, parse the article's page
         else:
             # Open the article's site
@@ -327,15 +326,18 @@ def main():
     try:
         dbConnection = dataToCouchDB.getConnectionDB(myDBname)
     except Exception:
-        print "DB connection error. " + Exception
+        print "-readPage: DB connection error. " + Exception
     print "===Starting parsing==="
     newArticleCount, myList = parseHTML(dbConnection)
     print "===Starting sentiment calculation==="
     calculated = basicSentimentAnalysis.startAnalysis(dbConnection)
+    print "===Fetching tags==="
+    tags = fetchTags.updateTags(dbConnection)
     print "============Results============"
     print "Number of new articles: " + str(newArticleCount)
     print "Out of: " + str(len(myList)) + " possible"
     print "Number of calculated articles: " + str(calculated)
+    print "Number of new articles with tags: " + str(tags)
 
 if __name__ == "__main__":
     main()

@@ -102,19 +102,17 @@ def startAnalysis(dbConn):
     # Create Dictionary from sentiment file
     sentList = createSentDict()
     numOfCalculated = 0
+    print "===startAnalysis: Checking DB for missing sentiments==="
     for article in dbConn:
         calculated = False
         myArticle = dataToCouchDB.loadArticleFromDB(dbConn, article)
-
         # First checking if article's sentiment already calculated
         # By checking the keys from the dictionary
         for key, value in myArticle.iteritems():
             if (key == 'sentiment'):
                 calculated = True
 
-        if (calculated):
-            print "-Sentiment already calculated for article: " + article
-        else:
+        if (not calculated):
             result = {}
             bodyDict = getBodySentiment(dict(dbConn[article]), sentList)
             commetsDict = getCommentsSentiment(dict(dbConn[article]), sentList)
