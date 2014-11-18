@@ -246,12 +246,13 @@ def parseHTML(myDB):
     '''
 
     # Read and split the links from a file
-    newsFile = open("myNewsSites.txt")
-    newsList = newsFile.read()
-    newsList = newsList.split("\n")
+    # newsFile = open("myNewsSites.txt")
+    # newsList = newsFile.read()
+    # newsList = newsList.split("\n")
+    # title = newsList[0]
+    # myLink = title[0:26]
+    myLink = "http://www.information.dk/"
     newArticleCount = 0
-    title = newsList[0]
-    myLink = title[0:26]
 
     # Open the link
     htmlobj = urllib.urlopen(myLink)
