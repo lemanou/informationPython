@@ -28,14 +28,20 @@ def createSentDict():
     return sentList
 
 
-def is_NOT_empty(any_structure):
+def wordCounting(wordsList, sentList):
     '''
-    Function used to check for empty data structures
+    Function used to calculate the Number Of Words found in sentiment list
+    and the sentiment score
     '''
-    if any_structure:
-        return True
-    else:
-        return False
+    aSent = 0       # Sentiment
+    sCount = 0      # Number Of Words found in sentiment list
+
+    for word in wordsList:
+        if word in sentList:
+            sCount += 1
+            aSent += sentList[word]
+
+    return sCount, aSent    
 
 
 def getCommentsSentiment(post, sentList):
@@ -48,18 +54,16 @@ def getCommentsSentiment(post, sentList):
     sAvg = 0
     # Get the comments of the article, split it to words and lowercase them
     myArticle = post['article']['comments']
-    if (is_NOT_empty(myArticle)):
+    # Check if the article is empty
+    if (not myArticle):
         myArticle = post['article']['comments']['commentsBody']
         for i, articleComments in enumerate(myArticle):
             wordsList = splitTextToWords(myArticle[str(i)])
             wordsList = [x.lower() for x in wordsList]
 
             # Calculate the sentiment score
-            for word in wordsList:
-                if word in sentList:
-                    sCount += 1
-                    comSent += sentList[word]
-
+            sCount, comSent = wordCounting(wordsList, sentList)
+            
         if sCount != 0:
             sAvg = round(float(comSent)/sCount, 2)
 
@@ -72,20 +76,17 @@ def getBodySentiment(post, sentList):
     Function used to calculate the sentiment of the body
     from a specific article
     '''
-    # Get the body of the article, split it to words and lowercase them
-    articleBody = post['article']['body']
-    wordsList = splitTextToWords(articleBody)
-    wordsList = [x.lower() for x in wordsList]
-
-    # Calculate the sentiment score
     bdSent = 0  # Body sentiment
     sCount = 0  # Number Of Words found in sentiment list
     sAvg = 0
 
-    for word in wordsList:
-        if word in sentList:
-            sCount += 1
-            bdSent += sentList[word]
+    # Get the body of the article, split it to words and lowercase them
+    articleBody = post['article']['body']
+    wordsList = splitTextToWords(articleBody)
+    wordsList = [x.lower() for x in wordsList]
+    
+    # Calculate the sentiment score
+    sCount, bdSent = wordCounting(wordsList, sentList)
 
     if sCount != 0:
         sAvg = round(float(bdSent)/sCount, 2)
