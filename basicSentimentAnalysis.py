@@ -41,7 +41,7 @@ def wordCounting(wordsList, sentList):
             sCount += 1
             aSent += sentList[word]
 
-    return sCount, aSent    
+    return sCount, aSent
 
 
 def getCommentsSentiment(post, sentList):
@@ -55,7 +55,7 @@ def getCommentsSentiment(post, sentList):
     # Get the comments of the article, split it to words and lowercase them
     myArticle = post['article']['comments']
     # Check if the article is empty
-    if (not myArticle):
+    if (myArticle):
         myArticle = post['article']['comments']['commentsBody']
         for i, articleComments in enumerate(myArticle):
             wordsList = splitTextToWords(myArticle[str(i)])
@@ -63,7 +63,7 @@ def getCommentsSentiment(post, sentList):
 
             # Calculate the sentiment score
             sCount, comSent = wordCounting(wordsList, sentList)
-            
+
         if sCount != 0:
             sAvg = round(float(comSent)/sCount, 2)
 
@@ -84,7 +84,7 @@ def getBodySentiment(post, sentList):
     articleBody = post['article']['body']
     wordsList = splitTextToWords(articleBody)
     wordsList = [x.lower() for x in wordsList]
-    
+
     # Calculate the sentiment score
     sCount, bdSent = wordCounting(wordsList, sentList)
 

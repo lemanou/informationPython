@@ -11,6 +11,7 @@ import dataToCouchDB
 import readPage
 import basicSentimentAnalysis
 import fetchTags
+import plottinByTag
 
 
 def main():
@@ -34,6 +35,9 @@ def main():
     print "Out of: " + str(len(myList)) + " possible"
     print "Number of calculated articles: " + str(calculated)
     print "Number of new articles with tags: " + str(tags)
+
+    print "\n============Plotting============"
+    plottinByTag.startPlotting(dbConnection)
 
 if __name__ == "__main__":
     main()
