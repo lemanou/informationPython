@@ -46,7 +46,6 @@ def tagSentPlottingD(mydefaultDict):
 
             # Plotting
             plt.figure(tag)
-            plt.subplot
             width = 0.3
             plt.bar(nOfArt, bodyAvgList, width=width,
                     color='blue', alpha=0.5, label='Body')

@@ -12,6 +12,7 @@ import readPage
 import basicSentimentAnalysis
 import fetchTags
 import plottinByTag
+import plottinByType
 
 
 def main():
@@ -36,8 +37,14 @@ def main():
     print "Number of calculated articles: " + str(calculated)
     print "Number of new articles with tags: " + str(tags)
 
-    print "\n============Plotting============"
+    print "\n=======Plotting by Tag========="
     plottinByTag.startPlotting(dbConnection)
+
+    print "\n=======Plotting by Type========"
+    plottinByType.startPlotting(dbConnection)
+
+    print "\n==============================="
+
 
 if __name__ == "__main__":
     main()
