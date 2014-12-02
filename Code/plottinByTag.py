@@ -4,6 +4,10 @@ Created on Sun Nov 10 10:31:23 2014
 
 Information.dk mining
 
+plottinByTag
+=========================================================
+Plotting calculated sentiments by tag.
+---------------------------------------------------------
 """
 
 import matplotlib.pyplot as plt

@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Auto Generated Documentation &mdash; Information.dk mining using python 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Information.dk mining using python 1.0.0 documentation" href="index.html" />
+    <link rel="prev" title="Information.dk tutorial" href="tutorial.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Information.dk tutorial"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-main">
+<span id="auto-generated-documentation"></span><h1>Auto Generated Documentation<a class="headerlink" href="#module-main" title="Permalink to this headline">¶</a></h1>
+<p>Created on Sat Sep 27 09:39:42 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="main-program">
+<h2>Main program.<a class="headerlink" href="#main-program" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="main.checkStart">
+<tt class="descclassname">main.</tt><tt class="descname">checkStart</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/main.html#checkStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#main.checkStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to check if this is the first time the code runs</p>
+</dd></dl>
+
+</div>
+<span class="target" id="module-basicSentimentAnalysis"></span><p>Created on Sat Nov 1 19:39:42 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="basicsentimentanalysis">
+<h2>basicSentimentAnalysis<a class="headerlink" href="#basicsentimentanalysis" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="calculate-the-sentiments-of-the-articles">
+<h3>Calculate the sentiments of the articles.<a class="headerlink" href="#calculate-the-sentiments-of-the-articles" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="basicSentimentAnalysis.createSentDict">
+<tt class="descclassname">basicSentimentAnalysis.</tt><tt class="descname">createSentDict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/basicSentimentAnalysis.html#createSentDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#basicSentimentAnalysis.createSentDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to create a dictionary from the sentiment file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="basicSentimentAnalysis.getBodySentiment">
+<tt class="descclassname">basicSentimentAnalysis.</tt><tt class="descname">getBodySentiment</tt><big>(</big><em>post</em>, <em>sentList</em><big>)</big><a class="reference internal" href="_modules/basicSentimentAnalysis.html#getBodySentiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#basicSentimentAnalysis.getBodySentiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to calculate the sentiment of the body
+from a specific article</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="basicSentimentAnalysis.getCommentsSentiment">
+<tt class="descclassname">basicSentimentAnalysis.</tt><tt class="descname">getCommentsSentiment</tt><big>(</big><em>post</em>, <em>sentList</em><big>)</big><a class="reference internal" href="_modules/basicSentimentAnalysis.html#getCommentsSentiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#basicSentimentAnalysis.getCommentsSentiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to calculate the sentiment of the comments
+from a specific article</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="basicSentimentAnalysis.splitTextToWords">
+<tt class="descclassname">basicSentimentAnalysis.</tt><tt class="descname">splitTextToWords</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="_modules/basicSentimentAnalysis.html#splitTextToWords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#basicSentimentAnalysis.splitTextToWords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to word tokenize fron nltk</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="basicSentimentAnalysis.startAnalysis">
+<tt class="descclassname">basicSentimentAnalysis.</tt><tt class="descname">startAnalysis</tt><big>(</big><em>dbConn</em><big>)</big><a class="reference internal" href="_modules/basicSentimentAnalysis.html#startAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#basicSentimentAnalysis.startAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to calculate the sentiment of the comments and a body
+from all db articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="basicSentimentAnalysis.wordCounting">
+<tt class="descclassname">basicSentimentAnalysis.</tt><tt class="descname">wordCounting</tt><big>(</big><em>wordsList</em>, <em>sentList</em><big>)</big><a class="reference internal" href="_modules/basicSentimentAnalysis.html#wordCounting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#basicSentimentAnalysis.wordCounting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to calculate the Number Of Words found in sentiment list
+and the sentiment score</p>
+</dd></dl>
+
+</div>
+</div>
+<span class="target" id="module-dataToCouchDB"></span><p>Created on Sat Sep 27 09:39:42 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="datatocouchdb">
+<h2>dataToCouchDB<a class="headerlink" href="#datatocouchdb" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="file-used-to-transfer-data-from-and-to-couchdb">
+<h3>File used to transfer data from and to couchDB.<a class="headerlink" href="#file-used-to-transfer-data-from-and-to-couchdb" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="dataToCouchDB.checkIfArticleInDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">checkIfArticleInDB</tt><big>(</big><em>db</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#checkIfArticleInDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.checkIfArticleInDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to check a specific article is in couchDB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.createDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">createDB</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#createDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.createDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to create couchDB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.deleteDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">deleteDB</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#deleteDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.deleteDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to delete couchDB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.getConnectionDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">getConnectionDB</tt><big>(</big><em>locDB</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#getConnectionDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.getConnectionDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to create couchDB connection</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.loadArticleFromDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">loadArticleFromDB</tt><big>(</big><em>db</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#loadArticleFromDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.loadArticleFromDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to load a specific article from couchDB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.storeDicInDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">storeDicInDB</tt><big>(</big><em>db</em>, <em>myDic</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#storeDicInDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.storeDicInDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to store a new article in couchDB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.storeSentInDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">storeSentInDB</tt><big>(</big><em>db</em>, <em>mySentiment</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#storeSentInDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.storeSentInDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to store the calculated sentiment
+in couchDB for the specific article</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dataToCouchDB.storeTagsInDB">
+<tt class="descclassname">dataToCouchDB.</tt><tt class="descname">storeTagsInDB</tt><big>(</big><em>db</em>, <em>tags</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/dataToCouchDB.html#storeTagsInDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataToCouchDB.storeTagsInDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to store the tags from &lt;normal&gt; articles in couchDB</p>
+</dd></dl>
+
+</div>
+</div>
+<span class="target" id="module-fetchTags"></span><p>Created on Sat Nov 1 19:39:42 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="fetchtags">
+<h2>fetchTags<a class="headerlink" href="#fetchtags" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fetching-tags-only-from-normal-type-articles">
+<h3>Fetching tags ONLY from normal type articles<a class="headerlink" href="#fetching-tags-only-from-normal-type-articles" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="fetchTags.getTags">
+<tt class="descclassname">fetchTags.</tt><tt class="descname">getTags</tt><big>(</big><em>post</em><big>)</big><a class="reference internal" href="_modules/fetchTags.html#getTags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fetchTags.getTags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to fetch the tags of the normal articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fetchTags.updateTags">
+<tt class="descclassname">fetchTags.</tt><tt class="descname">updateTags</tt><big>(</big><em>dbConn</em><big>)</big><a class="reference internal" href="_modules/fetchTags.html#updateTags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fetchTags.updateTags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to update the tags of the normal articles</p>
+</dd></dl>
+
+</div>
+</div>
+<span class="target" id="module-plottinByTag"></span><p>Created on Sun Nov 10 10:31:23 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="plottinbytag">
+<h2>plottinByTag<a class="headerlink" href="#plottinbytag" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="plotting-calculated-sentiments-by-tag">
+<h3>Plotting calculated sentiments by tag.<a class="headerlink" href="#plotting-calculated-sentiments-by-tag" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="plottinByTag.createList">
+<tt class="descclassname">plottinByTag.</tt><tt class="descname">createList</tt><big>(</big><em>tmpList</em><big>)</big><a class="reference internal" href="_modules/plottinByTag.html#createList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plottinByTag.createList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a list from 1 to n for the bins (n=number of articles with tag)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="plottinByTag.startPlotting">
+<tt class="descclassname">plottinByTag.</tt><tt class="descname">startPlotting</tt><big>(</big><em>dbConn</em><big>)</big><a class="reference internal" href="_modules/plottinByTag.html#startPlotting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plottinByTag.startPlotting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to fetch and plot specific articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="plottinByTag.tagSentPlottingD">
+<tt class="descclassname">plottinByTag.</tt><tt class="descname">tagSentPlottingD</tt><big>(</big><em>mydefaultDict</em><big>)</big><a class="reference internal" href="_modules/plottinByTag.html#tagSentPlottingD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plottinByTag.tagSentPlottingD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the articles from the dictionary</p>
+</dd></dl>
+
+</div>
+</div>
+<span class="target" id="module-plottinByType"></span><p>Created on Sun Nov 10 10:31:23 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="plottinbytype">
+<h2>plottinByType<a class="headerlink" href="#plottinbytype" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="plotting-calculated-sentiments-by-type">
+<h3>Plotting calculated sentiments by type.<a class="headerlink" href="#plotting-calculated-sentiments-by-type" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="plottinByType.sentPlotting">
+<tt class="descclassname">plottinByType.</tt><tt class="descname">sentPlotting</tt><big>(</big><em>mydefaultDict</em><big>)</big><a class="reference internal" href="_modules/plottinByType.html#sentPlotting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plottinByType.sentPlotting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the articles from the dictionary</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="plottinByType.startPlotting">
+<tt class="descclassname">plottinByType.</tt><tt class="descname">startPlotting</tt><big>(</big><em>dbConn</em><big>)</big><a class="reference internal" href="_modules/plottinByType.html#startPlotting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plottinByType.startPlotting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to fetch and plot specific articles</p>
+</dd></dl>
+
+</div>
+</div>
+<span class="target" id="module-readPage"></span><p>Created on Sat Sep 27 09:39:42 2014</p>
+<p>Information.dk mining</p>
+<div class="section" id="readpage">
+<h2>readPage<a class="headerlink" href="#readpage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="file-used-to-parse-the-news-web-page-and-fetch-the-data">
+<h3>File used to parse the news web page and fetch the data.<a class="headerlink" href="#file-used-to-parse-the-news-web-page-and-fetch-the-data" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="readPage.getBody">
+<tt class="descclassname">readPage.</tt><tt class="descname">getBody</tt><big>(</big><em>tree</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/readPage.html#getBody"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.getBody" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to fetch all the body / &lt;p&gt; tags from an article</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.getComments">
+<tt class="descclassname">readPage.</tt><tt class="descname">getComments</tt><big>(</big><em>tree</em><big>)</big><a class="reference internal" href="_modules/readPage.html#getComments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.getComments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to fetch all the comments from an article</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.parseBlog">
+<tt class="descclassname">readPage.</tt><tt class="descname">parseBlog</tt><big>(</big><em>myLink</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/readPage.html#parseBlog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.parseBlog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to parse the blog articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.parseFilme">
+<tt class="descclassname">readPage.</tt><tt class="descname">parseFilme</tt><big>(</big><em>myLink</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/readPage.html#parseFilme"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.parseFilme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to parse the film articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.parseHTML">
+<tt class="descclassname">readPage.</tt><tt class="descname">parseHTML</tt><big>(</big><em>myDB</em><big>)</big><a class="reference internal" href="_modules/readPage.html#parseHTML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.parseHTML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to parse the information.dk main page
+Find the relevant articles
+Call the different &#8220;parser&#8221; for each article type</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.parseNormal">
+<tt class="descclassname">readPage.</tt><tt class="descname">parseNormal</tt><big>(</big><em>myLink</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/readPage.html#parseNormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.parseNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to parse the normal articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.parseNyheder">
+<tt class="descclassname">readPage.</tt><tt class="descname">parseNyheder</tt><big>(</big><em>myLink</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/readPage.html#parseNyheder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.parseNyheder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to parse the news articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.parseTelegram">
+<tt class="descclassname">readPage.</tt><tt class="descname">parseTelegram</tt><big>(</big><em>myLink</em>, <em>postID</em><big>)</big><a class="reference internal" href="_modules/readPage.html#parseTelegram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.parseTelegram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to parse the telegram articles</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readPage.removeParenthesis">
+<tt class="descclassname">readPage.</tt><tt class="descname">removeParenthesis</tt><big>(</big><em>tmp</em><big>)</big><a class="reference internal" href="_modules/readPage.html#removeParenthesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#readPage.removeParenthesis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to remove parenthesis from the comments</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Auto Generated Documentation</a><ul>
+<li><a class="reference internal" href="#main-program">Main program.</a></li>
+<li><a class="reference internal" href="#basicsentimentanalysis">basicSentimentAnalysis</a><ul>
+<li><a class="reference internal" href="#calculate-the-sentiments-of-the-articles">Calculate the sentiments of the articles.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#datatocouchdb">dataToCouchDB</a><ul>
+<li><a class="reference internal" href="#file-used-to-transfer-data-from-and-to-couchdb">File used to transfer data from and to couchDB.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fetchtags">fetchTags</a><ul>
+<li><a class="reference internal" href="#fetching-tags-only-from-normal-type-articles">Fetching tags ONLY from normal type articles</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plottinbytag">plottinByTag</a><ul>
+<li><a class="reference internal" href="#plotting-calculated-sentiments-by-tag">Plotting calculated sentiments by tag.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plottinbytype">plottinByType</a><ul>
+<li><a class="reference internal" href="#plotting-calculated-sentiments-by-type">Plotting calculated sentiments by type.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#readpage">readPage</a><ul>
+<li><a class="reference internal" href="#file-used-to-parse-the-news-web-page-and-fetch-the-data">File used to parse the news web page and fetch the data.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="previous chapter">Information.dk tutorial</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/code.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Information.dk tutorial"
+             >previous</a> |</li>
+        <li><a href="index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Eleftherios Manousakis, Sigurd Knarhoi Johannsen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

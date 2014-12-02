@@ -3,6 +3,10 @@
 Created on Sat Sep 27 09:39:42 2014
 
 Information.dk mining
+
+readPage
+=========================================================
+File used to parse the news web page and fetch the data.
 ---------------------------------------------------------
 """
 
@@ -15,6 +19,9 @@ import basicSentimentAnalysis
 
 
 def removeParenthesis(tmp):
+    '''
+    Function used to remove parenthesis from the comments
+    '''
     if '(' in tmp:
         tmp = tmp.replace("(", "")
     if ')' in tmp:

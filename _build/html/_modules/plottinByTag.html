@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>plottinByTag &mdash; Information.dk mining using python 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Information.dk mining using python 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for plottinByTag</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Sun Nov 10 10:31:23 2014</span>
+
+<span class="sd">Information.dk mining</span>
+
+<span class="sd">plottinByTag</span>
+<span class="sd">=========================================================</span>
+<span class="sd">Plotting calculated sentiments by tag.</span>
+<span class="sd">---------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">dataToCouchDB</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+
+
+<div class="viewcode-block" id="createList"><a class="viewcode-back" href="../code.html#plottinByTag.createList">[docs]</a><span class="k">def</span> <span class="nf">createList</span><span class="p">(</span><span class="n">tmpList</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create a list from 1 to n for the bins (n=number of articles with tag)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">resultList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tmpList</span><span class="p">):</span>
+        <span class="c"># To start from article count representation from 1</span>
+        <span class="n">resultList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resultList</span>
+
+</div>
+<div class="viewcode-block" id="tagSentPlottingD"><a class="viewcode-back" href="../code.html#plottinByTag.tagSentPlottingD">[docs]</a><span class="k">def</span> <span class="nf">tagSentPlottingD</span><span class="p">(</span><span class="n">mydefaultDict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Plot the articles from the dictionary</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># Loop through the tags</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">mydefaultDict</span><span class="p">:</span>
+        <span class="c"># Loop through the lists</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sentList</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mydefaultDict</span><span class="p">[</span><span class="n">tag</span><span class="p">]):</span>
+            <span class="n">bodyAvgList</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">commAvgList</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c"># Loop through the lists in the lists</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">myList</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sentList</span><span class="p">):</span>
+                <span class="c"># Seperate the contents from body and comments average values</span>
+                <span class="n">floatBAvg</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">myList</span><span class="p">[</span><span class="s">&#39;body&#39;</span><span class="p">][</span><span class="s">&#39;Average&#39;</span><span class="p">])</span>
+                <span class="n">bodyAvgList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">floatBAvg</span><span class="p">)</span>
+                <span class="n">floatCAvg</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">myList</span><span class="p">[</span><span class="s">&#39;comments&#39;</span><span class="p">][</span><span class="s">&#39;Average&#39;</span><span class="p">])</span>
+                <span class="n">commAvgList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">floatCAvg</span><span class="p">)</span>
+
+            <span class="c"># Create a list from 1 to n for the bins</span>
+            <span class="c"># (n=number of articles with tag)</span>
+            <span class="n">nOfArt</span> <span class="o">=</span> <span class="n">createList</span><span class="p">(</span><span class="n">bodyAvgList</span><span class="p">)</span>
+
+            <span class="c"># Plotting</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="mf">0.3</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">nOfArt</span><span class="p">,</span> <span class="n">bodyAvgList</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Body&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">nOfArt</span><span class="p">,</span> <span class="n">commAvgList</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Comments&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;upper right&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&quot;Articles&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&quot;Sentiment Average&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;Tag: &quot;</span> <span class="o">+</span> <span class="n">tag</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">tag</span> <span class="o">+</span> <span class="s">&quot;.png&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="startPlotting"><a class="viewcode-back" href="../code.html#plottinByTag.startPlotting">[docs]</a><span class="k">def</span> <span class="nf">startPlotting</span><span class="p">(</span><span class="n">dbConn</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to fetch and plot specific articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">print</span> <span class="s">&quot;===startPlotting: Checking DB===&quot;</span>
+    <span class="n">tagList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tmpList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c"># Fetch all &quot;normal&quot; articles from the DB</span>
+    <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">dbConn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">article</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">7</span><span class="p">):</span>
+            <span class="n">myArticle</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">loadArticleFromDB</span><span class="p">(</span><span class="n">dbConn</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+            <span class="c"># Get the tags, split them</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">myArticle</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]):</span>
+                <span class="n">tmpList</span> <span class="o">=</span> <span class="n">myArticle</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="c"># Keep words bigger than 3</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">tmpList</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">tagList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+    <span class="c"># Find the 3 most common tags to plot</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">tagList</span><span class="p">)</span>
+    <span class="n">commonTagList</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="s">&quot;===startPlotting: Fetching tags=&quot;</span>
+    <span class="c"># Create a dictionary of lists using defaultdict</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">commonTagList</span><span class="p">:</span>
+        <span class="n">sentList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">dbConn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">article</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">7</span><span class="p">):</span>
+                <span class="n">myArticle</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">loadArticleFromDB</span><span class="p">(</span><span class="n">dbConn</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+                <span class="c"># with all the tags</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">myArticle</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]):</span>
+                    <span class="n">sentList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myArticle</span><span class="p">[</span><span class="s">&#39;sentiment&#39;</span><span class="p">])</span>
+
+        <span class="n">d</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentList</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="s">&quot;===startPlotting: Plotting======&quot;</span>
+    <span class="n">tagSentPlottingD</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s">&quot;===Plotting complete===&quot;</span>
+
+</div>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">myDBname</span> <span class="o">=</span> <span class="s">&#39;information_dk_articles&#39;</span>
+    <span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">getConnectionDB</span><span class="p">(</span><span class="n">myDBname</span><span class="p">)</span>
+    <span class="n">startPlotting</span><span class="p">(</span><span class="n">dbConnection</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Eleftherios Manousakis, Sigurd Knarhoi Johannsen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

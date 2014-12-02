@@ -3,6 +3,10 @@
 Created on Sat Nov 1 19:39:42 2014
 
 Information.dk mining
+
+basicSentimentAnalysis
+=========================================================
+Calculate the sentiments of the articles.
 ---------------------------------------------------------
 """
 from nltk import word_tokenize

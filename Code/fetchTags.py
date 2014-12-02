@@ -3,6 +3,10 @@
 Created on Sat Nov 1 19:39:42 2014
 
 Information.dk mining
+
+fetchTags
+=========================================================
+Fetching tags ONLY from normal type articles
 ---------------------------------------------------------
 """
 import urllib
@@ -11,10 +15,9 @@ from bs4 import BeautifulSoup
 
 
 def getTags(post):
-    # Used only for Normal Articles
-    # we discovered that Normal articles have tags
-    # so we will build on our current implementation to add that
-    # <Not optimal since we parse the page again>
+    '''
+    Function used to fetch the tags of the normal articles
+    '''
     # Open the site
     url = "http://www.information.dk" + post['_id']
     htmlfile = urllib.urlopen(url)
@@ -42,7 +45,7 @@ def getTags(post):
 
 def updateTags(dbConn):
     '''
-    Function used to fetch the tags of the normal articles
+    Function used to update the tags of the normal articles
     '''
     numOfCalculated = 0
     print "===updateTags: Checking DB for missing tags==="

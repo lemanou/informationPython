@@ -4,6 +4,10 @@ Created on Sun Nov 10 10:31:23 2014
 
 Information.dk mining
 
+plottinByType
+=========================================================
+Plotting calculated sentiments by type.
+---------------------------------------------------------
 """
 
 import numpy as np

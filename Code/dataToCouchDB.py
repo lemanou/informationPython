@@ -3,6 +3,10 @@
 Created on Sat Sep 27 09:39:42 2014
 
 Information.dk mining
+
+dataToCouchDB
+=========================================================
+File used to transfer data from and to couchDB.
 ---------------------------------------------------------
 """
 import couchdb

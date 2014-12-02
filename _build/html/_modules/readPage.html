@@ -1,0 +1,443 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>readPage &mdash; Information.dk mining using python 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Information.dk mining using python 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for readPage</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Sat Sep 27 09:39:42 2014</span>
+
+<span class="sd">Information.dk mining</span>
+
+<span class="sd">readPage</span>
+<span class="sd">=========================================================</span>
+<span class="sd">File used to parse the news web page and fetch the data.</span>
+<span class="sd">---------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="kn">import</span> <span class="nn">dataToCouchDB</span>
+<span class="kn">import</span> <span class="nn">fetchTags</span>
+<span class="kn">import</span> <span class="nn">basicSentimentAnalysis</span>
+
+
+<div class="viewcode-block" id="removeParenthesis"><a class="viewcode-back" href="../code.html#readPage.removeParenthesis">[docs]</a><span class="k">def</span> <span class="nf">removeParenthesis</span><span class="p">(</span><span class="n">tmp</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to remove parenthesis from the comments</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="s">&#39;(&#39;</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;(&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;)&#39;</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;)&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tmp</span>
+
+
+<span class="c"># Parsing the articles based on categories and tags</span></div>
+<div class="viewcode-block" id="getBody"><a class="viewcode-back" href="../code.html#readPage.getBody">[docs]</a><span class="k">def</span> <span class="nf">getBody</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">postID</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to fetch all the body / &lt;p&gt; tags from an article</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="s">&#39;nyhedsblog&#39;</span> <span class="ow">in</span> <span class="n">postID</span><span class="p">:</span>
+        <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-field-underrubrik&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-body&quot;</span>
+
+    <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">childdiv</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">childdiv</span><span class="o">.</span><span class="n">string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="n">childdiv</span><span class="o">.</span><span class="n">string</span>
+            <span class="k">if</span> <span class="s">&#39;&lt;strong&gt;&#39;</span> <span class="ow">or</span> <span class="s">&#39;&lt;/strong&gt;&#39;</span> <span class="ow">in</span> <span class="n">childdiv</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+
+    <span class="k">return</span> <span class="n">body</span>
+
+</div>
+<div class="viewcode-block" id="getComments"><a class="viewcode-back" href="../code.html#readPage.getComments">[docs]</a><span class="k">def</span> <span class="nf">getComments</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to fetch all the comments from an article</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">dAuthor</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">dComment</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">comments</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s">&quot;comment-wrapper&quot;</span><span class="p">):</span>
+        <span class="n">myArray</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">myArray2</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">comments</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">comments</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;comment-name&quot;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">childdiv</span> <span class="ow">in</span> <span class="n">author</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">childdiv</span><span class="o">.</span><span class="n">string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+                        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">myArray</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">childdiv</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c"># !!!</span>
+            <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field-item even&quot;</span>
+            <span class="k">for</span> <span class="n">commentBody</span> <span class="ow">in</span> <span class="n">comments</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">cmnt</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+                <span class="k">for</span> <span class="n">childdiv</span> <span class="ow">in</span> <span class="n">commentBody</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">childdiv</span><span class="o">.</span><span class="n">string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+                        <span class="n">cmnt</span> <span class="o">+=</span> <span class="n">childdiv</span><span class="o">.</span><span class="n">string</span>
+                <span class="n">myArray2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmnt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">myArray</span><span class="p">)):</span>
+            <span class="n">dAuthor</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArray</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+            <span class="n">dComment</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArray2</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;commentsAuthor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dAuthor</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;commentsBody&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dComment</span>
+    <span class="k">return</span> <span class="n">article</span>
+
+</div>
+<div class="viewcode-block" id="parseNormal"><a class="viewcode-back" href="../code.html#readPage.parseNormal">[docs]</a><span class="k">def</span> <span class="nf">parseNormal</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to parse the normal articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># Open the site</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">myLink</span> <span class="o">+</span> <span class="n">postID</span>
+    <span class="n">htmlfile</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">htmltext</span> <span class="o">=</span> <span class="n">htmlfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">htmltext</span><span class="p">)</span>
+
+    <span class="c"># Get the relevant parts from the page</span>
+    <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;node-title&quot;</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-field-underrubrik&quot;</span>
+    <span class="k">for</span> <span class="n">abstract</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;abstract&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">abstract</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field-name-comment-count-link-top&quot;</span>
+    <span class="k">for</span> <span class="n">numCom</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numCom</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">13</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;numberOfComments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">removeParenthesis</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getBody</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getComments</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">article</span>
+
+</div>
+<div class="viewcode-block" id="parseTelegram"><a class="viewcode-back" href="../code.html#readPage.parseTelegram">[docs]</a><span class="k">def</span> <span class="nf">parseTelegram</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to parse the telegram articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># Open the site</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">myLink</span> <span class="o">+</span> <span class="n">postID</span>
+    <span class="n">htmlfile</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">htmltext</span> <span class="o">=</span> <span class="n">htmlfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">htmltext</span><span class="p">)</span>
+
+    <span class="c"># Get the relevant parts from the page</span>
+    <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;node-title&quot;</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-field-ritzau-subheader&quot;</span>
+    <span class="k">for</span> <span class="n">abstract</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;abstract&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">abstract</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s">&#39;protokol&#39;</span> <span class="ow">in</span> <span class="n">postID</span><span class="p">:</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;numberOfComments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;unknown&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">numCom</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;active&quot;</span><span class="p">):</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">numCom</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">13</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+            <span class="n">article</span><span class="p">[</span><span class="s">&quot;numberOfComments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">removeParenthesis</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getBody</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getComments</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">article</span>
+
+</div>
+<div class="viewcode-block" id="parseNyheder"><a class="viewcode-back" href="../code.html#readPage.parseNyheder">[docs]</a><span class="k">def</span> <span class="nf">parseNyheder</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to parse the news articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># Open the site</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">myLink</span> <span class="o">+</span> <span class="n">postID</span>
+    <span class="n">htmlfile</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">htmltext</span> <span class="o">=</span> <span class="n">htmlfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">htmltext</span><span class="p">)</span>
+
+    <span class="c"># Get the relevant parts from the page</span>
+    <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;field field-name-title&quot;</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-field-underrubrik&quot;</span>
+    <span class="k">for</span> <span class="n">abstract</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;abstract&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">abstract</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">numCom</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;li&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;comment last&quot;</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numCom</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">13</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;numberOfComments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">removeParenthesis</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getBody</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getComments</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">article</span>
+
+</div>
+<div class="viewcode-block" id="parseBlog"><a class="viewcode-back" href="../code.html#readPage.parseBlog">[docs]</a><span class="k">def</span> <span class="nf">parseBlog</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to parse the blog articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># Open the site</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">myLink</span> <span class="o">+</span> <span class="n">postID</span>
+    <span class="n">htmlfile</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">htmltext</span> <span class="o">=</span> <span class="n">htmlfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">htmltext</span><span class="p">)</span>
+
+    <span class="c"># Get the relevant parts from the page</span>
+    <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;node-title&quot;</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-body&quot;</span>
+    <span class="k">for</span> <span class="n">div</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="c"># Get the first child (&lt;p&gt;) in the div</span>
+        <span class="k">for</span> <span class="n">childdiv</span> <span class="ow">in</span> <span class="n">div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">):</span>
+            <span class="n">article</span><span class="p">[</span><span class="s">&quot;abstract&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">childdiv</span><span class="o">.</span><span class="n">string</span>
+            <span class="k">break</span>
+
+    <span class="k">for</span> <span class="n">numCom</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;li&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;comment last&quot;</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numCom</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">13</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;numberOfComments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">removeParenthesis</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getBody</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getComments</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">article</span>
+
+</div>
+<div class="viewcode-block" id="parseFilme"><a class="viewcode-back" href="../code.html#readPage.parseFilme">[docs]</a><span class="k">def</span> <span class="nf">parseFilme</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to parse the film articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># Open the site</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">myLink</span> <span class="o">+</span> <span class="n">postID</span>
+    <span class="n">htmlfile</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">htmltext</span> <span class="o">=</span> <span class="n">htmlfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">htmltext</span><span class="p">)</span>
+
+    <span class="c"># Get the relevant parts from the page</span>
+    <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;field field-name-title&quot;</span><span class="p">):</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">neededClass</span> <span class="o">=</span> <span class="s">&quot;field field-name-body&quot;</span>
+    <span class="k">for</span> <span class="n">div</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="n">neededClass</span><span class="p">):</span>
+        <span class="c"># Get the first child (&lt;p&gt;) in the div</span>
+        <span class="k">for</span> <span class="n">childdiv</span> <span class="ow">in</span> <span class="n">div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">):</span>
+            <span class="n">article</span><span class="p">[</span><span class="s">&quot;abstract&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">childdiv</span><span class="o">.</span><span class="n">string</span>
+            <span class="k">break</span>
+
+    <span class="k">for</span> <span class="n">numCom</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;li&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;comment last&quot;</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numCom</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">13</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+        <span class="n">article</span><span class="p">[</span><span class="s">&quot;numberOfComments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">removeParenthesis</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;body&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getBody</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+    <span class="n">article</span><span class="p">[</span><span class="s">&quot;comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getComments</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">article</span>
+
+</div>
+<div class="viewcode-block" id="parseHTML"><a class="viewcode-back" href="../code.html#readPage.parseHTML">[docs]</a><span class="k">def</span> <span class="nf">parseHTML</span><span class="p">(</span><span class="n">myDB</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to parse the information.dk main page</span>
+<span class="sd">    Find the relevant articles</span>
+<span class="sd">    Call the different &quot;parser&quot; for each article type</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># Read and split the links from a file</span>
+    <span class="c"># newsFile = open(&quot;myNewsSites.txt&quot;)</span>
+    <span class="c"># newsList = newsFile.read()</span>
+    <span class="c"># newsList = newsList.split(&quot;\n&quot;)</span>
+    <span class="c"># title = newsList[0]</span>
+    <span class="c"># myLink = title[0:26]</span>
+    <span class="n">myLink</span> <span class="o">=</span> <span class="s">&quot;http://www.information.dk/&quot;</span>
+    <span class="n">newArticleCount</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c"># Open the link</span>
+    <span class="n">htmlobj</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">myLink</span><span class="p">)</span>
+    <span class="n">htmltext</span> <span class="o">=</span> <span class="n">htmlobj</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">htmltext</span><span class="p">)</span>
+
+    <span class="n">myList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c"># Get all the available article posts (postID) from the page</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;h3&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">&quot;node-title&quot;</span><span class="p">):</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">):</span>
+            <span class="n">myId</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;href&#39;</span><span class="p">)</span>
+            <span class="c"># Inserting the new post to the end of the list</span>
+            <span class="n">myList</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">myList</span><span class="p">),</span> <span class="n">myId</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">postID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">myList</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;+readPage: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">postID</span><span class="p">)</span>
+        <span class="c"># First check if article is already in local DB</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">checkIfArticleInDB</span><span class="p">(</span><span class="n">myDB</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s">&quot;-readPage: Article already in DB - SKIPPING&quot;</span>
+        <span class="c"># If not, parse the article&#39;s page</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Open the article&#39;s site</span>
+            <span class="n">myLink</span> <span class="o">=</span> <span class="n">myLink</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">25</span><span class="p">]</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">myLink</span> <span class="o">+</span> <span class="n">postID</span>
+            <span class="n">urlLength</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">myDict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">check</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="c"># Different parsing based on article type / URL length</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">urlLength</span> <span class="o">==</span> <span class="mi">32</span><span class="p">):</span>
+                <span class="c"># print &quot;Normal/Random: &quot; + str(urlLength)</span>
+                <span class="n">myArticle</span> <span class="o">=</span> <span class="n">parseNormal</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+                <span class="n">myDict</span><span class="p">[</span><span class="s">&quot;article&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArticle</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">urlLength</span> <span class="o">==</span> <span class="mi">41</span><span class="p">):</span>
+                <span class="c"># print &quot;Telegram OR Protocol: &quot; + str(urlLength)</span>
+                <span class="c"># Protocols have no abstract or numCom</span>
+                <span class="n">myArticle</span> <span class="o">=</span> <span class="n">parseTelegram</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+                <span class="n">myDict</span><span class="p">[</span><span class="s">&quot;article&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArticle</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">urlLength</span> <span class="o">==</span> <span class="mi">43</span><span class="p">):</span>
+                <span class="c"># print &quot;Nyhedsblog: &quot; + str(urlLength)</span>
+                <span class="n">myArticle</span> <span class="o">=</span> <span class="n">parseNyheder</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+                <span class="n">myDict</span><span class="p">[</span><span class="s">&quot;article&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArticle</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">urlLength</span> <span class="o">==</span> <span class="mi">44</span><span class="p">):</span>
+                <span class="c"># print &quot;Blogs: &quot; + str(urlLength)</span>
+                <span class="n">myArticle</span> <span class="o">=</span> <span class="n">parseBlog</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+                <span class="n">myDict</span><span class="p">[</span><span class="s">&quot;article&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArticle</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">urlLength</span> <span class="o">==</span> <span class="mi">49</span><span class="p">):</span>
+                <span class="c"># print &quot;Kortfilmsbloggen: &quot; + str(urlLength)</span>
+                <span class="n">myArticle</span> <span class="o">=</span> <span class="n">parseFilme</span><span class="p">(</span><span class="n">myLink</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+                <span class="n">myDict</span><span class="p">[</span><span class="s">&quot;article&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">myArticle</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">urlLength</span> <span class="o">==</span> <span class="mi">55</span><span class="p">):</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> NOT PROCESSED - Comment from random article.&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> NOT PROCESSED - Unknown type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlLength</span><span class="p">)</span>
+
+            <span class="c"># Check for &quot;known&quot; / parsed article.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">check</span><span class="p">):</span>
+                <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">storeDicInDB</span><span class="p">(</span><span class="n">myDB</span><span class="p">,</span> <span class="n">myDict</span><span class="p">,</span> <span class="n">postID</span><span class="p">)</span>
+                <span class="n">newArticleCount</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">newArticleCount</span><span class="p">,</span> <span class="n">myList</span>
+
+</div>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">myDBname</span> <span class="o">=</span> <span class="s">&#39;information_dk_articles&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">getConnectionDB</span><span class="p">(</span><span class="n">myDBname</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;-readPage: DB connection error. &quot;</span> <span class="o">+</span> <span class="ne">Exception</span>
+    <span class="k">print</span> <span class="s">&quot;===Starting parsing===&quot;</span>
+    <span class="n">newArticleCount</span><span class="p">,</span> <span class="n">myList</span> <span class="o">=</span> <span class="n">parseHTML</span><span class="p">(</span><span class="n">dbConnection</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;===Starting sentiment calculation===&quot;</span>
+    <span class="n">calculated</span> <span class="o">=</span> <span class="n">basicSentimentAnalysis</span><span class="o">.</span><span class="n">startAnalysis</span><span class="p">(</span><span class="n">dbConnection</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;===Fetching tags===&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">fetchTags</span><span class="o">.</span><span class="n">updateTags</span><span class="p">(</span><span class="n">dbConnection</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;============Results============&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;Number of new articles: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">newArticleCount</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;Out of: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">myList</span><span class="p">))</span> <span class="o">+</span> <span class="s">&quot; possible&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;Number of calculated articles: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">calculated</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;Number of new articles with tags: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Eleftherios Manousakis, Sigurd Knarhoi Johannsen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

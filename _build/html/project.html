@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Project Summary &mdash; Information.dk mining using python 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Information.dk mining using python 1.0.0 documentation" href="index.html" />
+    <link rel="next" title="Information.dk tutorial" href="tutorial.html" />
+    <link rel="prev" title="Welcome to Information.dk mining using python’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Information.dk tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Information.dk mining using python’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="project-summary">
+<h1>Project Summary<a class="headerlink" href="#project-summary" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="goals-achieved">
+<h2>Goals Achieved<a class="headerlink" href="#goals-achieved" title="Permalink to this headline">¶</a></h2>
+<p>Goal 1 - Parse Information.dk main page</p>
+<p>We successfully parsed the main page of Information.dk by using beautiful soup.</p>
+<p>Goal 2 - Save data to couchdb</p>
+<p>We are successfully exchanging data from local couchdb.
+We choose couchdb because of its ease of use which json/dictionary objects.</p>
+<p>Goal 3 - Calculate sentiment</p>
+<p>We calculated the sentiment of the articles by using a file that the professor gave us,
+called Nielsen2011Sentiment_afinndk.txt</p>
+<p>Goal 4 - Fetch Tags</p>
+<p>We discovered that Normal articles have tags so we decided build on our current
+implementation to add those. However, this is no optimal since we parse the page again.
+By sorting articles by tags, we are somewhat able to compare articles on the same subject,
+allowing us to see if sentiments follow subject.</p>
+<p>Goal 5 - Plotting</p>
+<p>We decided to plot our data based on tags and types. As a result, by individually comparing the
+article body and its comments with a sentiment list, we get an average sentiment for each.
+We plot this correlation and compare the graphs for each of the three article types.
+Afterwards we search our database by tags. The three most common tags are used - and articles with
+the same subject, according to tag, are compared.</p>
+</div>
+<div class="section" id="lessons-learned">
+<h2>Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Project Summary</a><ul>
+<li><a class="reference internal" href="#goals-achieved">Goals Achieved</a></li>
+<li><a class="reference internal" href="#lessons-learned">Lessons Learned</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Information.dk mining using python&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="next chapter">Information.dk tutorial</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/project.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Information.dk tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Information.dk mining using python’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Eleftherios Manousakis, Sigurd Knarhoi Johannsen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

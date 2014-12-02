@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>basicSentimentAnalysis &mdash; Information.dk mining using python 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Information.dk mining using python 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for basicSentimentAnalysis</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Sat Nov 1 19:39:42 2014</span>
+
+<span class="sd">Information.dk mining</span>
+
+<span class="sd">basicSentimentAnalysis</span>
+<span class="sd">=========================================================</span>
+<span class="sd">Calculate the sentiments of the articles.</span>
+<span class="sd">---------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">nltk</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="kn">import</span> <span class="nn">dataToCouchDB</span>
+
+
+<div class="viewcode-block" id="splitTextToWords"><a class="viewcode-back" href="../code.html#basicSentimentAnalysis.splitTextToWords">[docs]</a><span class="k">def</span> <span class="nf">splitTextToWords</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to word tokenize fron nltk</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="createSentDict"><a class="viewcode-back" href="../code.html#basicSentimentAnalysis.createSentDict">[docs]</a><span class="k">def</span> <span class="nf">createSentDict</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to create a dictionary from the sentiment file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">sentList</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;Nielsen2011Sentiment_afinndk.txt&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">sentList</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sentList</span>
+
+</div>
+<div class="viewcode-block" id="wordCounting"><a class="viewcode-back" href="../code.html#basicSentimentAnalysis.wordCounting">[docs]</a><span class="k">def</span> <span class="nf">wordCounting</span><span class="p">(</span><span class="n">wordsList</span><span class="p">,</span> <span class="n">sentList</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to calculate the Number Of Words found in sentiment list</span>
+<span class="sd">    and the sentiment score</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">aSent</span> <span class="o">=</span> <span class="mi">0</span>       <span class="c"># Sentiment</span>
+    <span class="n">sCount</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c"># Number Of Words found in sentiment list</span>
+
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">wordsList</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentList</span><span class="p">:</span>
+            <span class="n">sCount</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">aSent</span> <span class="o">+=</span> <span class="n">sentList</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">sCount</span><span class="p">,</span> <span class="n">aSent</span>
+
+</div>
+<div class="viewcode-block" id="getCommentsSentiment"><a class="viewcode-back" href="../code.html#basicSentimentAnalysis.getCommentsSentiment">[docs]</a><span class="k">def</span> <span class="nf">getCommentsSentiment</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">sentList</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to calculate the sentiment of the comments</span>
+<span class="sd">    from a specific article</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">comSent</span> <span class="o">=</span> <span class="mi">0</span>     <span class="c"># CommentS sentiment</span>
+    <span class="n">sCount</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c"># Number Of Words found in sentiment list</span>
+    <span class="n">sAvg</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c"># Get the comments of the article, split it to words and lowercase them</span>
+    <span class="n">myArticle</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s">&#39;article&#39;</span><span class="p">][</span><span class="s">&#39;comments&#39;</span><span class="p">]</span>
+    <span class="c"># Check if the article is empty</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">myArticle</span><span class="p">):</span>
+        <span class="n">myArticle</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s">&#39;article&#39;</span><span class="p">][</span><span class="s">&#39;comments&#39;</span><span class="p">][</span><span class="s">&#39;commentsBody&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">articleComments</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">myArticle</span><span class="p">):</span>
+            <span class="n">wordsList</span> <span class="o">=</span> <span class="n">splitTextToWords</span><span class="p">(</span><span class="n">myArticle</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
+            <span class="n">wordsList</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wordsList</span><span class="p">]</span>
+
+            <span class="c"># Calculate the sentiment score</span>
+            <span class="n">sCount</span><span class="p">,</span> <span class="n">comSent</span> <span class="o">=</span> <span class="n">wordCounting</span><span class="p">(</span><span class="n">wordsList</span><span class="p">,</span> <span class="n">sentList</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sCount</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sAvg</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">comSent</span><span class="p">)</span><span class="o">/</span><span class="n">sCount</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">sDict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Sentiment&#39;</span><span class="p">:</span> <span class="n">comSent</span><span class="p">,</span> <span class="s">&#39;NumberOfWords&#39;</span><span class="p">:</span> <span class="n">sCount</span><span class="p">,</span> <span class="s">&#39;Average&#39;</span><span class="p">:</span> <span class="n">sAvg</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">sDict</span>
+
+</div>
+<div class="viewcode-block" id="getBodySentiment"><a class="viewcode-back" href="../code.html#basicSentimentAnalysis.getBodySentiment">[docs]</a><span class="k">def</span> <span class="nf">getBodySentiment</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">sentList</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to calculate the sentiment of the body</span>
+<span class="sd">    from a specific article</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">bdSent</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c"># Body sentiment</span>
+    <span class="n">sCount</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c"># Number Of Words found in sentiment list</span>
+    <span class="n">sAvg</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c"># Get the body of the article, split it to words and lowercase them</span>
+    <span class="n">articleBody</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s">&#39;article&#39;</span><span class="p">][</span><span class="s">&#39;body&#39;</span><span class="p">]</span>
+    <span class="n">wordsList</span> <span class="o">=</span> <span class="n">splitTextToWords</span><span class="p">(</span><span class="n">articleBody</span><span class="p">)</span>
+    <span class="n">wordsList</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wordsList</span><span class="p">]</span>
+
+    <span class="c"># Calculate the sentiment score</span>
+    <span class="n">sCount</span><span class="p">,</span> <span class="n">bdSent</span> <span class="o">=</span> <span class="n">wordCounting</span><span class="p">(</span><span class="n">wordsList</span><span class="p">,</span> <span class="n">sentList</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sCount</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sAvg</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">bdSent</span><span class="p">)</span><span class="o">/</span><span class="n">sCount</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">sDict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Sentiment&#39;</span><span class="p">:</span> <span class="n">bdSent</span><span class="p">,</span> <span class="s">&#39;NumberOfWords&#39;</span><span class="p">:</span> <span class="n">sCount</span><span class="p">,</span> <span class="s">&#39;Average&#39;</span><span class="p">:</span> <span class="n">sAvg</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">sDict</span>
+
+</div>
+<div class="viewcode-block" id="startAnalysis"><a class="viewcode-back" href="../code.html#basicSentimentAnalysis.startAnalysis">[docs]</a><span class="k">def</span> <span class="nf">startAnalysis</span><span class="p">(</span><span class="n">dbConn</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function used to calculate the sentiment of the comments and a body</span>
+<span class="sd">    from all db articles</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># Create Dictionary from sentiment file</span>
+    <span class="n">sentList</span> <span class="o">=</span> <span class="n">createSentDict</span><span class="p">()</span>
+    <span class="n">numOfCalculated</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">print</span> <span class="s">&quot;===startAnalysis: Checking DB for missing sentiments===&quot;</span>
+    <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">dbConn</span><span class="p">:</span>
+        <span class="n">calculated</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">myArticle</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">loadArticleFromDB</span><span class="p">(</span><span class="n">dbConn</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+        <span class="c"># First checking if article&#39;s sentiment already calculated</span>
+        <span class="c"># By checking the keys from the dictionary</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">myArticle</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s">&#39;sentiment&#39;</span><span class="p">):</span>
+                <span class="n">calculated</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">calculated</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">bodyDict</span> <span class="o">=</span> <span class="n">getBodySentiment</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">dbConn</span><span class="p">[</span><span class="n">article</span><span class="p">]),</span> <span class="n">sentList</span><span class="p">)</span>
+            <span class="n">commetsDict</span> <span class="o">=</span> <span class="n">getCommentsSentiment</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">dbConn</span><span class="p">[</span><span class="n">article</span><span class="p">]),</span> <span class="n">sentList</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="s">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bodyDict</span>
+            <span class="n">result</span><span class="p">[</span><span class="s">&#39;comments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">commetsDict</span>
+            <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">storeSentInDB</span><span class="p">(</span><span class="n">dbConn</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+            <span class="n">numOfCalculated</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">numOfCalculated</span>
+
+</div>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">myDBname</span> <span class="o">=</span> <span class="s">&#39;information_dk_articles&#39;</span>
+    <span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">getConnectionDB</span><span class="p">(</span><span class="n">myDBname</span><span class="p">)</span>
+    <span class="n">startAnalysis</span><span class="p">(</span><span class="n">dbConnection</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Information.dk mining using python 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Eleftherios Manousakis, Sigurd Knarhoi Johannsen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

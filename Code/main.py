@@ -3,10 +3,13 @@
 Created on Sat Sep 27 09:39:42 2014
 
 Information.dk mining
+
+Main program.
 ---------------------------------------------------------
 """
 
 
+import sys
 import dataToCouchDB
 import readPage
 import basicSentimentAnalysis
@@ -15,12 +18,35 @@ import plottinByTag
 import plottinByType
 
 
+def checkStart():
+    '''
+    Function used to check if this is the first time the code runs
+    '''
+    print "Is this the first time you are running this code? (y/n)"
+    yes = set(['yes','y', 'ye', ''])
+    no = set(['no','n'])
+
+    choice = raw_input().lower()
+    if choice in yes:
+       return True
+    elif choice in no:
+       return False
+    else:
+       sys.stdout.write("Please respond with 'yes' or 'no'. Exiting...")
+       sys.exit()
+
+
 def main():
+    choise = checkStart()    
     myDBname = 'information_dk_articles'
-    try:
-        dbConnection = dataToCouchDB.getConnectionDB(myDBname)
-    except Exception:
-        print "DB connection error. " + Exception
+    if (choise):
+       dbConnection = dataToCouchDB.createDB(myDBname) 
+    else:
+        try:
+            dbConnection = dataToCouchDB.getConnectionDB(myDBname)
+        except err:
+            print "DB connection error. " + str(err)
+            return
 
     print "\n===Starting parsing==="
     newArticleCount, myList = readPage.parseHTML(dbConnection)
