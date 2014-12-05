@@ -10,7 +10,7 @@ We successfully parsed the main page of Information.dk by using beautiful soup.
 Goal 2 - Save data to couchdb
 
 We are successfully exchanging data from local couchdb. 
-We choose couchdb because of its ease of use which json/dictionary objects.
+We choose couchdb because of its ease of use of json and dictionary objects.
 
 Goal 3 - Calculate sentiment
 
@@ -19,8 +19,8 @@ called Nielsen2011Sentiment_afinndk.txt
 
 Goal 4 - Fetch Tags
 
-We discovered that Normal articles have tags so we decided build on our current 
-implementation to add those. However, this is no optimal since we parse the page again.
+We discovered that Normal articles have tags so we decided to build on our current 
+implementation to add those. However, this is not optimal since we parse the page again.
 By sorting articles by tags, we are somewhat able to compare articles on the same subject, 
 allowing us to see if sentiments follow subject.
 
