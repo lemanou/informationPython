@@ -34,3 +34,6 @@ the same subject, according to tag, are compared.
 
 Lessons Learned
 -----------------
+We got a first feeling on how to use python and what it can do as a language by using some basic libraries such as urllib, bs4 and nltk.
+Also, we understood how sentiment analysis works and the possibilities it gives us.
+Finally, by using matplotlib and numpy we saw how we can plot our results.

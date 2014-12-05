@@ -89,7 +89,7 @@
     <span class="n">choise</span> <span class="o">=</span> <span class="n">checkStart</span><span class="p">()</span>    
     <span class="n">myDBname</span> <span class="o">=</span> <span class="s">&#39;information_dk_articles&#39;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">choise</span><span class="p">):</span>
-       <span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">createDB</span><span class="p">(</span><span class="n">myDBname</span><span class="p">)</span> 
+       <span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">createDB</span><span class="p">(</span><span class="n">myDBname</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">dbConnection</span> <span class="o">=</span> <span class="n">dataToCouchDB</span><span class="o">.</span><span class="n">getConnectionDB</span><span class="p">(</span><span class="n">myDBname</span><span class="p">)</span>

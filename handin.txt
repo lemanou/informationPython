@@ -1,0 +1,14 @@
+{
+"title": "Data mining of Information.dk using Python",
+"members": [
+{ "name": "Eleftherios Manousakis",
+"study_number": "s141714"
+},
+{ "name": "Sigurd Knarhøi Johannsen",
+"study_number": "s042910"
+}
+],
+"git": "git@github.com:lemanou/informationPython.git",
+"description": "This project will data mine the different data that are available in the information.dk website ... etc",
+"modules": ["nltk", "etc"]
+} 

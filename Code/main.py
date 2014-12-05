@@ -23,29 +23,35 @@ def checkStart():
     Function used to check if this is the first time the code runs
     '''
     print "Is this the first time you are running this code? (y/n)"
-    yes = set(['yes','y', 'ye', ''])
-    no = set(['no','n'])
+    yes = set(['yes', 'y', 'ye', ''])
+    no = set(['no', 'n'])
 
     choice = raw_input().lower()
     if choice in yes:
-       return True
+        print "Do you have couchDB installed? (y/n)"
+        choice = raw_input().lower()
+        if choice in yes:
+            return True
+        else:
+            sys.stdout.write("Install couchDB to run this software. Exiting.")
+            sys.exit()
     elif choice in no:
-       return False
+        return False
     else:
-       sys.stdout.write("Please respond with 'yes' or 'no'. Exiting...")
-       sys.exit()
+        sys.stdout.write("Please respond with 'yes' or 'no'. Exiting.")
+        sys.exit()
 
 
 def main():
-    choise = checkStart()    
+    choise = checkStart()
     myDBname = 'information_dk_articles'
     if (choise):
-       dbConnection = dataToCouchDB.createDB(myDBname) 
+        dbConnection = dataToCouchDB.createDB(myDBname)
     else:
         try:
             dbConnection = dataToCouchDB.getConnectionDB(myDBname)
-        except err:
-            print "DB connection error. " + str(err)
+        except Exception:
+            print "DB connection error. " + str(Exception)
             return
 
     print "\n===Starting parsing==="
